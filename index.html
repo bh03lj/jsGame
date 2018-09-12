@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
+    <style type="text/css">
+      .game-container{  
+          display: inline-flex;
+          width: 100%;
+          height:100%;
+          background-image: url('imgs/snow.png');
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: cover; 
+      }
+      .enemy{
+        -moz-transform: scaleX(-1);
+        -o-transform: scaleX(-1);
+        -webkit-transform: scaleX(-1);
+        transform: scaleX(-1);
+        filter: FlipH;
+        -ms-filter: "FlipH";
+      }
+      .wrapper{
+        margin: 50px;
+      }
+      .is-success{
+        width: 200px;
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+      <div class="game-container">
+        <div class="wrapper">
+          <progress class="progress is-success" value="100" max="100"></progress>
+          <img src="imgs/stance.gif" class="player" />
+        </div>
+        <div class="wrapper">
+          <progress class="progress is-success enemy-health" value="100" max="100"></progress>
+          <img src="imgs/idleloop.gif"/ class="enemy">
+        </div>  
+      </div>
+  </body>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script type="text/javascript">
+   
+    $('.enemy').click(function(){
+
+      var health = $('.enemy-health').attr('value');
+
+      $('.player').attr('src', 'imgs/attacking.gif');
+      new Audio('sounds/hit2.mp3').play();    
+        
+        setTimeout(function(){
+
+          $('.player').attr('src', 'imgs/stance.gif');
+          $('.enemy').attr('src', 'imgs/gethitloop.gif');
+          $('.enemy-health').attr('value', health - 25);
+
+          setTimeout(function(){
+            $('.enemy').attr('src', 'imgs/idleloop.gif');
+          }, 500);
+
+        }, 500);
+
+    
+    });
+  </script>
+</html> 
