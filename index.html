@@ -5,16 +5,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
     <style type="text/css">
-      .game-container{  
-          display: inline-flex;
+      .game-container{
+          position: relative;
           width: 100%;
-          height:100%;
+          height: 100vh;
           background-image: url('imgs/snow.png');
           background-position: center;
           background-repeat: no-repeat;
-          background-size: cover; 
+          background-size: cover;
       }
-      .enemy{
+      .flipped{
         -moz-transform: scaleX(-1);
         -o-transform: scaleX(-1);
         -webkit-transform: scaleX(-1);
@@ -22,25 +22,72 @@
         filter: FlipH;
         -ms-filter: "FlipH";
       }
-      .wrapper{
-        margin: 50px;
-      }
+
       .is-success{
         width: 200px;
         margin: auto;
+      }
+      .health-bar{
+        width: 105px;
+        height: 90px;
+        position: absolute;
+        top: 0;
+        left: 10px;
+
+      }
+      .health-bar .is-success{
+        position: absolute;
+        top: 79px;
+        left: 0;
+
+      }
+      .player-container{
+        position: absolute;;
+        height: 204px;
+        bottom: 5%;
+        left: 20%;
+      }
+      .player-container img{
+        width: auto;
+        height: 204px;
+      }
+      .enemy-container{
+        position: absolute;
+        height: 204px;
+        bottom: 5%;
+        left: 50%;
+        transform: translateY(-35px);
+      }
+      .enemy-container img{
+        width: auto;
+        height: 204px;
+      }
+      .floor{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 50px;
+        width: 100%;
+        background-image: url('imgs/snow_bar.png');
+        background-repeat: repeat-x;
       }
     </style>
   </head>
   <body>
       <div class="game-container">
-        <div class="wrapper">
+        <div class="health-bar">
+          <img src="imgs/face.png" />
           <progress class="progress is-success" value="100" max="100"></progress>
+        </div>
+        <div class="player-container">
           <img src="imgs/stance.gif" class="player" />
         </div>
-        <div class="wrapper">
+        <div class="enemy-container">
           <progress class="progress is-success enemy-health" value="100" max="100"></progress>
-          <img src="imgs/idleloop.gif"/ class="enemy">
-        </div>  
+          <img src="imgs/idleloop.gif" class="flipped enemy"/>
+        </div> 
+        <div class="floor">
+        </div>
       </div>
   </body>
   <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
@@ -52,7 +99,7 @@
 
       $('.player').attr('src', 'imgs/attacking.gif');
       new Audio('sounds/hit2.mp3').play();    
-        
+
         setTimeout(function(){
 
           $('.player').attr('src', 'imgs/stance.gif');
@@ -64,8 +111,91 @@
           }, 500);
 
         }, 500);
-
-    
     });
+
+    $(document).keydown(function(e) {
+        switch (e.which) {
+            case 37:
+                if ($('.player').hasClass('walking')) {
+                } else{
+                    $('.player').addClass('walking');
+                    $('.player').attr('src', 'imgs/walking.gif');
+
+                }
+                $('.player-container').addClass('flipped');
+                $('.player-container').css('left', $('.player-container').offset().left - 10);
+                break;
+            case 39:
+                if ($('.player').hasClass('walking')) {
+                } else{
+                    $('.player').addClass('walking');
+                    $('.player').attr('src', 'imgs/walking.gif')
+                }
+                $('.player-container').removeClass('flipped');
+                $('.player-container').css('left', $('.player-container').offset().left + 10);
+
+                break;
+            case 32:
+                console.log('jump');
+                $('.player-container').animate({ bottom: "+=300px" }, 500 );
+                $('.player-container').animate({ bottom: "-=300px" }, 500 );
+                $('.player').attr('src', 'imgs/jump.gif');
+                break;
+        }
+    });
+
+    $(document).keyup(function(e) {
+        switch (e.which) {
+            case 37:
+                $('.player').removeClass('walking');
+                $('.player').attr('src', 'imgs/stance.gif');
+                break;
+            case 39:
+                $('.player').removeClass('walking');
+                $('.player').attr('src', 'imgs/stance.gif');
+                break;
+            case  32:
+                $('.player').attr('src', 'imgs/stance.gif');
+        }
+    });
+
+    var enemyWalking = setInterval(function() {
+        $('.enemy-container').animate({ left: "-=100px" }, 2000 );
+        $('.enemy').attr('src', 'imgs/walkloop.gif');
+    },500);
+
+
+    var collision = setInterval(function() {
+
+        var playerPos = $('.player-container').position();
+        var enemyPos = $('.enemy-container').position();
+        console.log(playerPos);
+        console.log(enemyPos);
+        if (playerPos.left + 290 >= enemyPos.left){
+            clearInterval(enemyWalking);
+            $('.enemy-container').stop();
+            $('.enemy').attr('src', 'imgs/enemyAttack.gif');
+
+
+
+        }
+
+    },500);
+
+    function deathEnemy() {
+
+        var health = $('.enemy-health').attr('value');
+        console.log(health);
+
+        if (health == 0){
+            $('.enemy-container').fadeOut();
+            clearInterval(enemyWalking);
+            clearInterval(collision);
+            $('.enemy-container').stop();
+        }
+    }
+
+    setInterval(deathEnemy, 1000);
+
   </script>
 </html> 
